@@ -3,570 +3,445 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>CaMBRAIN — Real-time, Continuous EEG Inference with Causal State Space Models</title>
-<meta name="description" content="CaMBRAIN: a causal Mamba-3 state space model for real-time, continuous EEG streaming inference. UCF CRCV + Loma Linda University." />
-<meta property="og:title" content="CaMBRAIN — Real-time, Continuous EEG Inference with Causal State Space Models" />
-<meta property="og:description" content="A causal Mamba-3 state space model for real-time, continuous EEG streaming inference." />
+<title>CaMBRAIN: Real-time, Continuous EEG Inference with Causal State Space Models</title>
+<meta name="description" content="CaMBRAIN: a causal Mamba-3 state space model for real-time, streaming EEG inference. UCF CRCV + Loma Linda University." />
+<meta name="keywords" content="EEG, foundation model, Mamba, state space model, streaming inference, causal, neural signal" />
+<meta name="author" content="Abhilash Durgam, Nyle Siddiqui, Jeffrey A. Chan-Santiago, Qiushi Fu, Elakkat D. Gireesh, Mubarak Shah" />
+
+<meta property="og:title" content="CaMBRAIN: Real-time, Continuous EEG Inference with Causal State Space Models" />
+<meta property="og:description" content="A causal Mamba-3 foundation model for real-time, streaming EEG inference." />
 <meta property="og:image" content="assets/ContinuousEEG-poster.jpg" />
 <meta property="og:type" content="article" />
 <meta name="twitter:card" content="summary_large_image" />
 
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,700;1,9..144,400;1,9..144,500&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Noto+Serif:wght@400;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
 <style>
 :root {
-  --bg:           #F5F1E8;
-  --bg-elev:      #FBF8F0;
-  --ink:          #1A1A1A;
-  --muted:        #5C5C5C;
-  --rule:         rgba(0,0,0,0.10);
-  --rule-soft:    rgba(0,0,0,0.06);
-  --green:        #1B4332;
-  --green-bright: #22A06B;
-  --soon-bg:      #EFE7D2;
-  --soon-ink:     #6B5C2E;
-  --display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
-  --sans:    'IBM Plex Sans', system-ui, sans-serif;
-  --mono:    'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --ink:    #1a1a1a;
+  --muted:  #555;
+  --rule:   #d9d9d9;
+  --link:   #0066cc;
+  --bg:     #ffffff;
+  --code-bg: #f5f5f5;
+  --btn-bg:  #1a1a1a;
+  --btn-fg:  #ffffff;
 }
 
 * { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
+html, body { margin: 0; padding: 0; background: var(--bg); }
 body {
-  background: var(--bg);
   color: var(--ink);
-  font-family: var(--sans);
+  font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
   font-size: 17px;
-  line-height: 1.65;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
 }
 
-/* ---- Page-load animation ---- */
-@keyframes rise {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.rise { opacity: 0; animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) forwards; }
-.rise.d1 { animation-delay: 0.05s; }
-.rise.d2 { animation-delay: 0.15s; }
-.rise.d3 { animation-delay: 0.28s; }
-.rise.d4 { animation-delay: 0.40s; }
-.rise.d5 { animation-delay: 0.55s; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
 
-/* ---- Layout containers ---- */
-.wrap { max-width: 760px; margin: 0 auto; padding: 0 24px; }
-.wrap-wide { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
-
-/* ---- Top bar ---- */
-.topbar {
-  border-bottom: 1px solid var(--rule);
-  padding: 18px 0;
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted);
-  background: var(--bg);
-}
-.topbar .wrap-wide { display: flex; justify-content: space-between; align-items: center; }
-.topbar a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
-.topbar a:hover { color: var(--green); }
-.topmark { color: var(--ink); font-weight: 500; }
-
-/* ---- Hero EEG line ornament ---- */
-.eeg-band {
-  height: 64px;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  position: relative;
-  margin: 56px 0 32px;
-}
-.eeg-band svg { width: 100%; height: 100%; display: block; opacity: 0.55; }
-.eeg-band::after {
-  content: "";
-  position: absolute; inset: 0;
-  background: linear-gradient(90deg, var(--bg) 0%, transparent 8%, transparent 92%, var(--bg) 100%);
-  pointer-events: none;
+.container {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
-/* ---- Hero ---- */
-.hero { padding: 72px 0 24px; text-align: center; }
-.eyebrow {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--green);
-  margin-bottom: 28px;
+/* ---- Title block ---- */
+.title-block {
+  text-align: center;
+  padding: 56px 0 24px;
 }
-h1.title {
-  font-family: var(--display);
-  font-weight: 400;
-  font-size: clamp(34px, 5.6vw, 60px);
-  line-height: 1.05;
-  letter-spacing: -0.018em;
-  margin: 0 auto 14px;
-  max-width: 22ch;
+h1 {
+  font-family: 'Noto Sans', sans-serif;
+  font-weight: 700;
+  font-size: clamp(28px, 4.2vw, 44px);
+  line-height: 1.15;
+  margin: 0 0 16px;
+  letter-spacing: -0.01em;
   color: var(--ink);
 }
-h1.title .name {
-  font-style: italic;
+.venue {
+  font-size: 19px;
   font-weight: 500;
-  color: var(--green);
-  letter-spacing: -0.02em;
-}
-h1.title .em { font-style: italic; font-weight: 400; }
-
-.subtitle {
-  font-family: var(--display);
-  font-style: italic;
-  font-weight: 400;
-  font-size: 21px;
-  color: var(--muted);
-  max-width: 50ch;
-  margin: 0 auto 56px;
-  line-height: 1.45;
+  color: var(--ink);
+  margin: 0 0 28px;
 }
 
 /* ---- Authors ---- */
 .authors {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 6px 22px;
-  margin: 0 auto 14px;
-  font-size: 16.5px;
-  font-weight: 500;
-  max-width: 720px;
+  font-size: 17px;
+  line-height: 1.7;
+  margin: 8px 0 4px;
 }
-.author { white-space: nowrap; }
-.author .sup { font-size: 10px; color: var(--muted); vertical-align: super; margin-left: 1px; }
-.affil-key {
-  font-family: var(--mono);
-  font-size: 11.5px;
+.authors a {
+  color: var(--link);
+  text-decoration: none;
+}
+.authors a:hover { text-decoration: underline; }
+.authors sup { font-size: 11px; vertical-align: super; color: var(--ink); }
+.equal-note {
+  font-size: 13px;
   color: var(--muted);
-  letter-spacing: 0.04em;
-  margin: 8px auto 0;
-  max-width: 720px;
+  font-style: italic;
+  margin: 4px 0 12px;
+}
+.affil-line {
+  font-size: 15.5px;
+  color: var(--ink);
+  margin: 10px 0 28px;
   line-height: 1.7;
 }
-.affil-key sup { color: var(--green); margin-right: 4px; }
-.affil-key .sep { color: var(--rule); margin: 0 8px; }
+.affil-line sup { font-size: 11px; }
 
-/* ---- Actions ---- */
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  margin: 48px 0 12px;
-}
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 11px 18px;
-  border-radius: 999px;
-  font-family: var(--sans);
-  font-weight: 500;
-  font-size: 14.5px;
-  text-decoration: none;
-  border: 1px solid var(--ink);
-  background: var(--ink);
-  color: var(--bg);
-  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
-}
-.btn:hover { transform: translateY(-1px); background: var(--green); border-color: var(--green); }
-.btn .ico { width: 16px; height: 16px; flex-shrink: 0; }
-
-.btn.ghost {
-  background: transparent;
-  color: var(--ink);
-  border-color: var(--rule);
-}
-.btn.ghost:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-
-.btn.soon {
-  cursor: not-allowed;
-  pointer-events: none;
-  background: transparent;
-  color: var(--muted);
-  border-color: var(--rule);
-  position: relative;
-}
-.btn.soon .label { text-decoration: line-through; opacity: 0.6; }
-.pill {
-  display: inline-block;
-  background: var(--soon-bg);
-  color: var(--soon-ink);
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  padding: 3px 8px;
-  border-radius: 99px;
-  font-weight: 500;
-}
-
-/* ---- Video ---- */
-.video-section { margin: 64px 0 32px; }
-.video-frame {
-  position: relative;
-  border-radius: 14px;
-  overflow: hidden;
-  background: #000;
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.5) inset,
-    0 22px 60px -28px rgba(20, 20, 20, 0.5),
-    0 8px 20px -10px rgba(20, 20, 20, 0.25);
-  border: 1px solid var(--rule);
-}
-.video-frame video { display: block; width: 100%; height: auto; }
-.caption {
-  font-family: var(--display);
-  font-style: italic;
-  font-size: 15.5px;
-  color: var(--muted);
-  text-align: center;
-  margin-top: 18px;
-  line-height: 1.55;
-  max-width: 62ch;
-  margin-left: auto;
-  margin-right: auto;
-}
-.caption b { color: var(--ink); font-style: normal; font-weight: 500; font-family: var(--sans); }
-
-/* ---- Section ---- */
-section { padding: 56px 0; }
-section + section { border-top: 1px solid var(--rule-soft); }
-
-h2 {
-  font-family: var(--display);
-  font-weight: 400;
-  font-size: 32px;
-  letter-spacing: -0.01em;
-  margin: 0 0 8px;
-  line-height: 1.1;
-}
-.section-eyebrow {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--green);
-  margin-bottom: 24px;
-}
-section p { margin: 0 0 18px; color: #222; }
-section p:last-child { margin-bottom: 0; }
-
-/* ---- TL;DR cards ---- */
-.tldr {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 18px;
-  margin-top: 32px;
-}
-.tldr-card {
-  background: var(--bg-elev);
-  border: 1px solid var(--rule);
-  border-radius: 12px;
-  padding: 22px 22px 24px;
-}
-.tldr-card .num {
-  font-family: var(--display);
-  font-weight: 500;
-  font-style: italic;
-  font-size: 36px;
-  color: var(--green);
-  line-height: 1;
-  letter-spacing: -0.02em;
-}
-.tldr-card .lbl {
-  font-family: var(--mono);
-  font-size: 10.5px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin: 10px 0 6px;
-}
-.tldr-card .desc { font-size: 14.5px; color: var(--muted); line-height: 1.5; }
-
-/* ---- Citation ---- */
-.bibtex {
-  background: var(--bg-elev);
-  border: 1px solid var(--rule);
-  border-radius: 10px;
-  padding: 22px 24px;
-  font-family: var(--mono);
-  font-size: 13.5px;
-  line-height: 1.65;
-  color: var(--ink);
-  overflow-x: auto;
-  white-space: pre;
-  position: relative;
-  margin-top: 16px;
-}
-.copybtn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  font-family: var(--mono);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  padding: 6px 11px;
-  background: var(--bg);
-  border: 1px solid var(--rule);
-  border-radius: 6px;
-  cursor: pointer;
-  color: var(--muted);
-  transition: all 0.15s;
-}
-.copybtn:hover { color: var(--green); border-color: var(--green); }
-.copybtn.copied { color: var(--green); border-color: var(--green); }
-
-/* ---- Footer ---- */
-footer {
-  border-top: 1px solid var(--rule);
-  padding: 64px 0 56px;
-  margin-top: 24px;
-}
+/* ---- Logo row ---- */
 .logo-row {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 56px;
-  margin: 0 0 40px;
+  gap: 8px 48px;
+  margin: 24px 0 36px;
+}
+.logo-row .logo-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.logo-row .num {
+  font-size: 14px;
+  color: var(--ink);
+  font-weight: 500;
 }
 .logo-row img {
-  height: 56px;
+  height: 48px;
   width: auto;
-  max-width: 220px;
-  opacity: 0.78;
-  filter: grayscale(20%);
-  transition: opacity 0.2s, filter 0.2s;
+  max-width: 280px;
+  vertical-align: middle;
 }
-.logo-row a:hover img { opacity: 1; filter: grayscale(0%); }
-.footer-meta {
-  text-align: center;
-  font-family: var(--mono);
-  font-size: 11.5px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+.logo-row a { display: inline-flex; align-items: center; }
+
+/* ---- Action buttons ---- */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 32px 0 8px;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid var(--btn-bg);
+  transition: background 0.15s, color 0.15s;
+}
+.btn:hover { background: #444; text-decoration: none; }
+.btn .ico {
+  width: 16px; height: 16px;
+  display: inline-block;
+  vertical-align: middle;
+}
+.btn.disabled {
+  background: #fff;
+  color: var(--muted);
+  border: 1px solid var(--rule);
+  pointer-events: none;
+}
+.btn .pill {
+  display: inline-block;
+  background: rgba(255,255,255,0.18);
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 99px;
+  margin-left: 2px;
+  letter-spacing: 0.04em;
+}
+.btn.disabled .pill {
+  background: #f0f0f0;
   color: var(--muted);
 }
-.footer-meta a { color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--rule); }
-.footer-meta a:hover { color: var(--green); border-color: var(--green); }
 
-/* ---- Small screens ---- */
+/* ---- Hero video ---- */
+.hero-video {
+  margin: 40px 0 16px;
+}
+.hero-video video {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+}
+.caption {
+  font-size: 14.5px;
+  color: var(--muted);
+  text-align: center;
+  margin: 14px auto 0;
+  max-width: 76ch;
+  line-height: 1.55;
+}
+.caption b { color: var(--ink); font-weight: 500; }
+
+/* ---- Sections ---- */
+section { padding: 36px 0; }
+section + section { border-top: 1px solid var(--rule); }
+h2 {
+  font-family: 'Noto Sans', sans-serif;
+  font-weight: 700;
+  font-size: 26px;
+  margin: 0 0 20px;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+}
+section p {
+  margin: 0 0 16px;
+  text-align: justify;
+  hyphens: auto;
+}
+section p:last-child { margin-bottom: 0; }
+
+.tldr-list {
+  margin: 8px 0 0;
+  padding-left: 24px;
+}
+.tldr-list li {
+  margin: 6px 0;
+  line-height: 1.6;
+}
+
+/* ---- Figure ---- */
+.figure {
+  margin: 28px 0;
+}
+.figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+}
+.figure .fig-cap {
+  font-size: 14.5px;
+  color: var(--muted);
+  margin-top: 10px;
+  line-height: 1.55;
+}
+.figure .fig-cap b { color: var(--ink); font-weight: 500; }
+
+/* ---- BibTeX ---- */
+.bibtex {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 18px 22px;
+  font-family: 'Roboto Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--ink);
+  overflow-x: auto;
+  white-space: pre;
+  position: relative;
+  margin-top: 8px;
+}
+.copybtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.copybtn:hover { color: var(--ink); border-color: var(--ink); }
+.copybtn.copied { color: #2e7d32; border-color: #2e7d32; }
+
+/* ---- Footer ---- */
+footer {
+  text-align: center;
+  padding: 36px 0 28px;
+  margin-top: 24px;
+  border-top: 1px solid var(--rule);
+  font-size: 13.5px;
+  color: var(--muted);
+}
+footer a { color: var(--muted); text-decoration: underline; }
+footer a:hover { color: var(--ink); }
+
+/* ---- Mobile ---- */
 @media (max-width: 640px) {
-  .actions { flex-direction: column; align-items: stretch; }
-  .btn { justify-content: center; }
-  .logo-row { gap: 32px; }
-  .logo-row img { height: 44px; }
-  h1.title { font-size: 36px; }
-  .subtitle { font-size: 18px; margin-bottom: 36px; }
-  .eeg-band { margin: 32px 0 24px; height: 48px; }
-}
-
-/* ---- EEG live animation ---- */
-.eeg-trace { animation: trace-shift 24s linear infinite; }
-@keyframes trace-shift {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-
-/* ---- Reduced motion ---- */
-@media (prefers-reduced-motion: reduce) {
-  .rise { opacity: 1; animation: none; transform: none; }
-  .eeg-trace { animation: none; }
-  .btn { transition: none; }
+  .container { padding: 0 18px; }
+  .title-block { padding: 36px 0 20px; }
+  h1 { font-size: 26px; }
+  .venue { font-size: 16px; margin-bottom: 22px; }
+  .authors { font-size: 15.5px; }
+  .affil-line { font-size: 14px; }
+  .logo-row { gap: 18px 24px; }
+  .logo-row img { height: 38px; }
+  .actions { gap: 8px; }
+  .btn { font-size: 14px; padding: 7px 14px; }
 }
 </style>
 </head>
 <body>
 
-<!-- Top bar -->
-<div class="topbar">
-  <div class="wrap-wide">
-    <span class="topmark">CaMBRAIN</span>
-    <span>UCF&nbsp;CRCV · 2026</span>
-  </div>
-</div>
+<div class="container">
 
-<!-- Hero -->
-<main>
-<section class="hero">
-  <div class="wrap">
-    <div class="eyebrow rise d1">A Preprint · May 2026</div>
-    <h1 class="title rise d2">
-      <span class="name">CaMBRAIN</span><br/>
-      Real-time, Continuous EEG Inference<br/>
-      <span class="em">with Causal State Space Models</span>
-    </h1>
-    <p class="subtitle rise d3">
-      A causal Mamba-3 foundation model that treats EEG as one continuous stream — no sliding windows, no recomputation, fixed-size persistent state.
-    </p>
+  <!-- ====================== TITLE ====================== -->
+  <header class="title-block">
+    <h1>CaMBRAIN: Real-time, Continuous EEG Inference<br/>with Causal State Space Models</h1>
+    <style>
+      @media (min-width: 900px) {
+        h1 br { display: none; }
+        h1 { max-width: 24ch; margin-left: auto; margin-right: auto; }
+      }
+    </style>
+    <div class="venue">Preprint &middot; 2026</div>
 
-    <div class="authors rise d4">
-      <span class="author">Abhilash Durgam<span class="sup">1,*</span></span>
-      <span class="author">Nyle Siddiqui<span class="sup">1</span></span>
-      <span class="author">Jeffrey A. Chan-Santiago<span class="sup">1</span></span>
-      <span class="author">Qiushi Fu<span class="sup">2</span></span>
-      <span class="author">Elakkat D. Gireesh<span class="sup">3</span></span>
-      <span class="author">Mubarak Shah<span class="sup">1</span></span>
+    <div class="authors">
+      <a href="mailto:abhilash.durgam@ucf.edu">Abhilash Durgam</a><sup>1,*</sup>
+      &nbsp;&nbsp;
+      <a href="#">Nyle Siddiqui</a><sup>1</sup>
+      &nbsp;&nbsp;
+      <a href="#">Jeffrey A. Chan-Santiago</a><sup>1</sup>
+      &nbsp;&nbsp;
+      <a href="#">Qiushi Fu</a><sup>2</sup>
+      &nbsp;&nbsp;
+      <a href="#">Elakkat D. Gireesh</a><sup>3</sup>
+      &nbsp;&nbsp;
+      <a href="https://scholar.google.com/citations?user=p8gsO3gAAAAJ&hl=en">Mubarak Shah</a><sup>1</sup>
     </div>
-    <div class="affil-key rise d4">
-      <sup>1</sup>CRCV, University of Central Florida
-      <span class="sep">·</span>
-      <sup>2</sup>Department of MAE, UCF
-      <span class="sep">·</span>
-      <sup>3</sup>Department of Neurology, Loma Linda University
+    <div class="equal-note">* Corresponding author</div>
+
+    <div class="affil-line">
+      <sup>1</sup>Center for Research in Computer Vision, University of Central Florida &nbsp;&nbsp;
+      <sup>2</sup>Department of Mechanical &amp; Aerospace Engineering, UCF &nbsp;&nbsp;<br/>
+      <sup>3</sup>Department of Neurology, Loma Linda University School of Medicine
     </div>
 
-    <div class="actions rise d5">
-      <span class="btn soon" aria-disabled="true">
+    <!-- Affiliation logos -->
+    <div class="logo-row">
+      <div class="logo-item">
+        <span class="num"><sup>1,2</sup></span>
+        <a href="https://www.crcv.ucf.edu/" target="_blank" rel="noopener">
+          <img src="assets/logos/crcv_ucf.jpg" alt="UCF Center for Research in Computer Vision" />
+        </a>
+      </div>
+      <div class="logo-item">
+        <span class="num"><sup>3</sup></span>
+        <a href="https://medicine.llu.edu/" target="_blank" rel="noopener">
+          <img src="https://logowik.com/content/uploads/images/loma-linda-university-llu4536.jpg" alt="Loma Linda University" />
+        </a>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="actions">
+      <span class="btn disabled">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
-        <span class="label">Paper</span>
-        <span class="pill">Coming Soon</span>
+        Paper
+        <span class="pill">Soon</span>
       </span>
-      <span class="btn soon" aria-disabled="true">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3z"/><path d="M14 3h7v7h-7z"/><path d="M14 14h7v7h-7z"/><path d="M3 14h7v7H3z"/></svg>
-        <span class="label">arXiv</span>
-        <span class="pill">Coming Soon</span>
+      <span class="btn disabled">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3z M14 3h7v7h-7z M14 14h7v7h-7z M3 14h7v7H3z"/></svg>
+        arXiv
+        <span class="pill">Soon</span>
       </span>
-      <span class="btn soon" aria-disabled="true">
+      <span class="btn disabled">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-        <span class="label">Code</span>
-        <span class="pill">Coming Soon</span>
+        Code
+        <span class="pill">Soon</span>
       </span>
-      <a class="btn ghost" href="#citation">
+      <a class="btn" href="#bibtex">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         BibTeX
       </a>
     </div>
-  </div>
+  </header>
 
-  <!-- Animated EEG ornament -->
-  <div class="eeg-band" aria-hidden="true">
-    <svg viewBox="0 0 2400 60" preserveAspectRatio="none">
-      <g class="eeg-trace">
-        <path d="M0,30 Q40,28 60,30 T120,28 Q160,5 180,30 T240,32 Q260,55 280,30 T340,28 Q380,8 400,30 T460,31 Q500,52 520,30 T580,29 Q620,6 640,30 T700,32 Q740,55 760,30 T820,28 Q860,7 880,30 T940,31 Q980,53 1000,30 T1060,29 Q1100,6 1120,30 T1180,32 M1200,30 Q1240,28 1260,30 T1320,28 Q1360,5 1380,30 T1440,32 Q1460,55 1480,30 T1540,28 Q1580,8 1600,30 T1660,31 Q1700,52 1720,30 T1780,29 Q1820,6 1840,30 T1900,32 Q1940,55 1960,30 T2020,28 Q2060,7 2080,30 T2140,31 Q2180,53 2200,30 T2260,29 Q2300,6 2320,30 T2380,32" stroke="#1B4332" stroke-width="1.4" fill="none" stroke-linecap="round" />
-      </g>
-    </svg>
-  </div>
-</section>
-
-<!-- Video -->
-<section class="video-section">
-  <div class="wrap">
-    <div class="video-frame">
-      <video controls playsinline preload="metadata"
-             poster="assets/ContinuousEEG-poster.jpg"
-             aria-label="CaMBRAIN demo video: continuous EEG inference">
-        <source src="assets/ContinuousEEG.mp4" type="video/mp4" />
-        Your browser doesn't support inline video.
-        <a href="assets/ContinuousEEG.mp4">Download the demo (MP4, 2.2&nbsp;MB).</a>
-      </video>
-    </div>
+  <!-- ====================== HERO VIDEO ====================== -->
+  <div class="hero-video">
+    <video controls playsinline preload="metadata"
+           poster="assets/ContinuousEEG-poster.jpg"
+           aria-label="CaMBRAIN demo: continuous EEG inference">
+      <source src="assets/ContinuousEEG.mp4" type="video/mp4" />
+      Your browser does not support inline video.
+      <a href="assets/ContinuousEEG.mp4">Download the demo (MP4, 2.2&nbsp;MB).</a>
+    </video>
     <p class="caption">
-      <b>Continuous streaming inference.</b> CaMBRAIN updates a single fixed-size hidden state at 16&nbsp;Hz (62.5&nbsp;ms patches), with no buffering or window recomputation — predictions stream out as the EEG comes in.
+      <b>Continuous streaming inference on CHB-MIT.</b> CaMBRAIN updates a single fixed-size hidden state at 16&nbsp;Hz (62.5&nbsp;ms patches). Predictions stream out at patch arrival rate &mdash; no sliding windows, no recomputation.
     </p>
   </div>
-</section>
 
-<!-- Abstract -->
-<section id="abstract">
-  <div class="wrap">
-    <div class="section-eyebrow">Abstract</div>
-    <h2>Treating EEG as one continuous signal.</h2>
-    <p>Electroencephalography (EEG) is a critical, non-invasive method to monitor electrical brain activity. EEGs can span anywhere from a couple seconds to multiple hours, posing a major hurdle for existing deep learning methods: (1) existing EEG models are predominantly built on attention, incurring quadratic scaling as the sequence length increases, and (2) raw EEG must be processed in a sliding-window fashion due to fixed-length input requirements, preventing global understanding of the entire signal.</p>
-    <p>We propose <b>CaMBRAIN</b> — the first <i>Causal</i>, Mamba-based state space model (SSM) capable of real-time inference of EEG, arguing that bidirectional approaches are needlessly expensive given the causal, unidirectional nature of EEG. Training such a model is non-trivial: crucial EEG events can be extremely brief — within fractions of a second — yet separated by long intervals spanning minutes. Reconstruction-based self-supervised objectives are not well suited for streaming SSMs; they fail to train the hidden state to retain the salient long-range context needed for streaming inference.</p>
-    <p>We therefore introduce a multi-stage self-supervised training pipeline tailored to encourage long-range memory retention while preserving the linear-time complexity of state space models. CaMBRAIN achieves state-of-the-art results across 3 different EEG datasets with <b>&gt;10×</b> higher throughput than existing models, enabling long-range, continuous inference of variable-length EEG signals.</p>
-  </div>
-</section>
+  <!-- ====================== ABSTRACT ====================== -->
+  <section id="abstract">
+    <h2>Abstract</h2>
+    <p>Electroencephalography (EEG) is a critical, non-invasive method to monitor electrical brain activity. EEGs can span anywhere from a couple seconds to multiple hours, posing a major hurdle for existing deep learning methods: (1) existing EEG models are predominantly built on attention, incurring quadratic scaling as sequence length increases, and (2) raw EEG must be processed in a sliding-window fashion due to fixed-length input requirements, preventing global understanding of the entire signal.</p>
+    <p>We propose <b>CaMBRAIN</b> &mdash; the first causal, Mamba-based state space model (SSM) capable of real-time inference of EEG, arguing that bidirectional approaches are needlessly expensive given the causal, unidirectional nature of EEG. Training such a model is non-trivial: crucial EEG events can be extremely brief &mdash; within fractions of a second &mdash; yet separated by long intervals spanning minutes. Reconstruction-based self-supervised objectives are not well suited for streaming SSMs; they fail to train the hidden state to retain the salient long-range context needed for streaming inference.</p>
+    <p>We therefore introduce a multi-stage self-supervised training pipeline tailored to encourage long-range memory retention while preserving the linear-time complexity of state space models. CaMBRAIN achieves state-of-the-art results across 3 EEG datasets with <b>more than 10&times;</b> higher throughput than existing models, enabling long-range, continuous inference of variable-length EEG signals.</p>
+  </section>
 
-<!-- Key claims -->
-<section id="contributions">
-  <div class="wrap">
-    <div class="section-eyebrow">At a glance</div>
-    <h2>Streaming-first, by design.</h2>
-    <div class="tldr">
-      <div class="tldr-card">
-        <div class="num">O(1)</div>
-        <div class="lbl">Hidden state</div>
-        <div class="desc">A single persistent state vector updates per 62.5&nbsp;ms patch — independent of recording length.</div>
-      </div>
-      <div class="tldr-card">
-        <div class="num">1.23</div>
-        <div class="lbl">GFLOPs / sec</div>
-        <div class="desc">Sustained compute at 16&nbsp;Hz update rate. 6.1× lower than CBraMod, 158× lower than REVE.</div>
-      </div>
-      <div class="tldr-card">
-        <div class="num">3</div>
-        <div class="lbl">Datasets, SOTA</div>
-        <div class="desc">Best AUROC on TUAR artifact, CHB-MIT seizure, and MAT mental-stress detection.</div>
-      </div>
-      <div class="tldr-card">
-        <div class="num">37M</div>
-        <div class="lbl">Parameters</div>
-        <div class="desc">Matches or beats foundation models up to 8× larger while running at a fraction of the compute.</div>
-      </div>
-    </div>
-  </div>
-</section>
+  <!-- ====================== CONTRIBUTIONS ====================== -->
+  <section id="contributions">
+    <h2>Contributions</h2>
+    <ol class="tldr-list">
+      <li>The first <b>causal</b> Mamba-based EEG foundation model with verified streaming inference, updating a single <code>O(1)</code>-size hidden state per 62.5&nbsp;ms patch.</li>
+      <li>A multi-stage causal self-supervised training pipeline: causal autoregressive masking, followed by EMA-JEPA latent prediction with LUNA channel adaptation.</li>
+      <li>State-of-the-art AUROC on TUAR (artifact), CHB-MIT (seizure), and MAT (mental stress) at 36.7M parameters &mdash; matching or beating bidirectional models up to 8&times; larger.</li>
+      <li>Streaming-equivalent inference verified against parallel forward passes across 30 seeds and 3 checkpoints (max logit deviation &lt; 6&times;10<sup>&minus;3</sup>).</li>
+      <li><b>1.23 GFLOPs/s</b> sustained compute at 16&nbsp;Hz update rate &mdash; 6&times; lower than CBraMod, 158&times; lower than REVE-Base at typical streaming frequencies.</li>
+    </ol>
+  </section>
 
-<!-- Citation -->
-<section id="citation">
-  <div class="wrap">
-    <div class="section-eyebrow">Cite</div>
+  <!-- ====================== CITATION ====================== -->
+  <section id="bibtex">
     <h2>BibTeX</h2>
-    <p style="color: var(--muted); font-size: 15px;">
-      The arXiv identifier will be added once the preprint is announced. For now, please reference by title and authors.
+    <p style="font-size: 14.5px; color: var(--muted); margin-bottom: 12px;">
+      The arXiv identifier will be added once the preprint is announced. Until then, please cite by title and authors.
     </p>
-    <div class="bibtex" id="bibtex">@article{durgam2026cambrain,
-  title   = {CaMBRAIN: Real-time, Continuous EEG Inference with Causal State Space Models},
+    <div class="bibtex" id="bibtex-block">@article{durgam2026cambrain,
+  title   = {CaMBRAIN: Real-time, Continuous EEG Inference
+             with Causal State Space Models},
   author  = {Durgam, Abhilash and Siddiqui, Nyle and Chan-Santiago, Jeffrey A.
              and Fu, Qiushi and Gireesh, Elakkat D. and Shah, Mubarak},
   journal = {arXiv preprint},
   year    = {2026},
   note    = {Preprint forthcoming}
 }<button class="copybtn" id="copybtn" aria-label="Copy BibTeX">Copy</button></div>
-  </div>
-</section>
-</main>
+  </section>
 
-<!-- Footer -->
+  <!-- ====================== ACKS ====================== -->
+  <section id="acknowledgments">
+    <h2>Acknowledgments</h2>
+    <p>We thank the UCF Center for Research in Computer Vision and the Loma Linda University Department of Neurology for institutional support. The authors gratefully acknowledge compute resources from UCF's Newton cluster (NSF MRI award) used to train CaMBRAIN.</p>
+  </section>
+
+</div>
+
 <footer>
-  <div class="wrap-wide">
-    <div class="logo-row" aria-label="Affiliations">
-      <a href="https://www.crcv.ucf.edu/" target="_blank" rel="noopener" aria-label="CRCV at the University of Central Florida">
-        <img src="assets/logos/crcv.svg" alt="Center for Research in Computer Vision, UCF" />
-      </a>
-      <a href="https://www.ucf.edu/" target="_blank" rel="noopener" aria-label="University of Central Florida">
-        <img src="assets/logos/ucf.svg" alt="University of Central Florida" />
-      </a>
-      <a href="https://medicine.llu.edu/" target="_blank" rel="noopener" aria-label="Loma Linda University School of Medicine">
-        <img src="assets/logos/llu.svg" alt="Loma Linda University, School of Medicine" />
-      </a>
-    </div>
-    <div class="footer-meta">
-      © 2026 · Site by the authors · <a href="mailto:abhilash.durgam@ucf.edu">abhilash.durgam@ucf.edu</a>
-    </div>
-  </div>
+  &copy; 2026 The authors &middot;
+  Contact: <a href="mailto:abhilash.durgam@ucf.edu">abhilash.durgam@ucf.edu</a>
+  <br/><br/>
+  Page template adapted from the <a href="https://nerfies.github.io/" target="_blank" rel="noopener">Nerfies project page</a>.
 </footer>
 
 <script>
-// BibTeX copy
 (function(){
   var btn = document.getElementById('copybtn');
-  var pre = document.getElementById('bibtex');
+  var pre = document.getElementById('bibtex-block');
+  if (!btn || !pre) return;
   btn.addEventListener('click', function(){
     var text = pre.textContent.replace(/Copy$/, '').trim();
     navigator.clipboard.writeText(text).then(function(){

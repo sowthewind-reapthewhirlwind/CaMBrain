@@ -2,14 +2,16 @@
 
 Static project page for *CaMBRAIN: Real-time, Continuous EEG Inference with Causal State Space Models*.
 
-## Quick deploy to GitHub Pages
+Template: based on the **[Nerfies](https://nerfies.github.io/)** academic project page convention (also used by [3D Gaussian Splatting](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/) and most CRCV lab pages, e.g. [GAEA](https://ucf-crcv.github.io/GAEA/)).
 
-1. Create a new public repo, e.g. `cambrain` or `cambrain.github.io`.
-2. Copy everything in this folder into the repo root (or into a `/docs` folder).
-3. On GitHub: **Settings → Pages → Source: Deploy from a branch → Branch: `main`, folder `/ (root)`** (or `/docs` if you used that).
-4. Wait ~30 seconds. Your site is at `https://<user>.github.io/<repo>/`.
+## Deploy to GitHub Pages
 
-No build step — it's plain HTML/CSS/JS. The Google Fonts CSS is loaded from `fonts.googleapis.com` at runtime.
+1. Create a public repo named `cambrain` (or whatever you'd like the URL slug to be).
+2. Copy everything in this folder into the repo's root.
+3. Settings → Pages → **Source: Deploy from a branch** → Branch: `main` / `(root)` → Save.
+4. ~30 seconds later, your site is live at `https://<your-username>.github.io/cambrain/`.
+
+For the CRCV lab convention specifically (matching e.g. `ucf-crcv.github.io/GAEA/`), ask Dr. Shah whether you can push to the `UCF-CRCV` GitHub org instead — same files, but the URL becomes `https://ucf-crcv.github.io/cambrain/`, which looks more official.
 
 ## File layout
 
@@ -18,43 +20,49 @@ No build step — it's plain HTML/CSS/JS. The Google Fonts CSS is loaded from `f
 ├── index.html
 ├── README.md
 └── assets/
-    ├── ContinuousEEG.mp4               (2.2 MB, the demo video)
-    ├── ContinuousEEG-poster.jpg        (poster frame the video shows before play)
+    ├── ContinuousEEG.mp4               (the demo video, 2.2 MB)
+    ├── ContinuousEEG-poster.jpg        (poster frame shown before play)
     └── logos/
-        ├── crcv.svg                    (placeholder — swap for official)
-        ├── ucf.svg                     (placeholder — swap for official)
-        └── llu.svg                     (placeholder — swap for official)
+        └── crcv_ucf.jpg                (official CRCV + UCF combined logo, 1003×171)
 ```
 
-## Logos: replace the placeholders
+## About the Loma Linda logo
 
-The three SVGs in `assets/logos/` are clean text placeholders in each institution's brand colors. They look intentional, not "broken-image." Swap them with the official files when you have a minute:
+The CRCV+UCF logo (`assets/logos/crcv_ucf.jpg`) is the **official combined lab logo**, pulled from the [UCF-CRCV/GAEA](https://github.com/UCF-CRCV/GAEA) repo's `Assets/` folder. It's the exact file the lab uses on its other paper pages.
 
-| Slot                          | Where to grab the official file                                                |
-|-------------------------------|--------------------------------------------------------------------------------|
-| `assets/logos/crcv.svg`       | Right-click the logo in the header of <https://www.crcv.ucf.edu/> → Save Image |
-| `assets/logos/ucf.svg`        | UCF Brand portal: <https://www.ucf.edu/brand/brand-assets/logo-identity-system/> — use the **Primary Mark** (Pegasus + UCF wordmark) for academic context, NOT the athletic Knights logo |
-| `assets/logos/llu.svg`        | LLU Brand portal: <https://home.llu.edu/about-llu/visual-identity> — the **LLU School of Medicine** mark is the right one for Dr. Gireesh's Neurology affiliation |
+The Loma Linda logo is currently **hotlinked from logowik.com** (a free-vector-logo site), so the browser fetches it at view time. It works, but it's an external dependency — if logowik changes the URL or goes down, the LLU logo won't load. Recommended swap for the polished version:
 
-You can drop in `.svg` (vector — best), `.png` (use 2× resolution, ≥120px tall, transparent background ideal), or `.webp`. The HTML uses the filename `crcv.svg` / `ucf.svg` / `llu.svg`; if you save a different extension, also update the `src=` paths in `index.html` (search for `assets/logos/`).
+1. Email Dr. Gireesh or LLU Health Marketing (`marketing@llu.edu`) and ask for the official LLU School of Medicine logo as PNG or SVG. The brand portal at <https://styleguide.lluh.org/graphic-identity-guide/downloads> has it behind a "use agreement" click-through.
+2. Save the file as `assets/logos/llu.png` (or `.svg`) with a transparent background, sized to ~120px tall at 2× resolution.
+3. In `index.html`, find the LLU `<img>` tag and change:
+   ```html
+   <img src="https://logowik.com/content/uploads/images/loma-linda-university-llu4536.jpg" alt="Loma Linda University" />
+   ```
+   to:
+   ```html
+   <img src="assets/logos/llu.png" alt="Loma Linda University" />
+   ```
 
-If you want to keep the placeholders for now, the site will display them as-is — they're sized and colored to match the layout.
+That removes the external dependency.
 
-## Mark items as "Coming Soon" / live
+## Toggle the "Soon" buttons live
 
-The Paper / arXiv / Code buttons currently render as disabled "Coming Soon" pills. To switch any of them live:
+Each of the Paper / arXiv / Code buttons is currently a disabled `<span class="btn disabled">`. To activate one:
 
-1. Open `index.html` and find the relevant `<span class="btn soon">` block.
-2. Replace `<span class="btn soon" aria-disabled="true">` with `<a class="btn" href="YOUR_URL" target="_blank" rel="noopener">`.
+1. Find the relevant `<span>` block in `index.html`.
+2. Replace `<span class="btn disabled">` with `<a class="btn" href="YOUR_URL" target="_blank" rel="noopener">`.
 3. Replace the closing `</span>` with `</a>`.
-4. Delete the `<span class="pill">Coming Soon</span>` line.
+4. Delete the `<span class="pill">Soon</span>` line.
 
-Each block is already commented in the markup so they're easy to spot.
+## Update the BibTeX once arXiv announces
 
-## Update the BibTeX once arXiv is live
-
-In `index.html`, find `id="bibtex"` and update the entry. Replace `journal = {arXiv preprint}` and the `note` line with something like:
-
+In `index.html`, find `id="bibtex-block"` and update the entry. Replace:
+```bibtex
+journal = {arXiv preprint},
+year    = {2026},
+note    = {Preprint forthcoming}
+```
+with:
 ```bibtex
 journal = {arXiv preprint arXiv:2606.XXXXX},
 year    = {2026}
@@ -68,10 +76,14 @@ python3 -m http.server 8080
 # open http://localhost:8080
 ```
 
+## Author Google Scholar links
+
+The author names link to Google Scholar profiles via `<a href="...">` tags. Currently only Mubarak Shah's link is filled in (`scholar.google.com/citations?user=p8gsO3gAAAAJ`). The other authors have `href="#"` placeholders — replace each with the author's Scholar / personal URL.
+
 ## Tech notes
 
-- Fonts: Fraunces (variable serif) + IBM Plex Sans + IBM Plex Mono, loaded from Google Fonts. If your audience may be offline-first, self-host them by downloading from <https://fonts.google.com> and updating the `<link>` in `index.html`.
-- The EEG-trace animation at the top of the hero is a pure CSS `@keyframes` translate on an inline SVG path — no JS, no canvas.
-- Video tag uses `preload="metadata"` so the poster JPG loads immediately but the 2.2 MB MP4 only downloads on play.
-- `<meta property="og:image">` points at the poster JPG so link previews on Twitter/Slack/Discord show the demo frame.
-- Single HTML file, single CSS block, ~15 lines of JS for clipboard copy. No build tools, no bundler, nothing to install.
+- Single HTML file, single CSS block, ~15 lines of JS for the BibTeX copy button. No build step, no bundler, no dependencies beyond Google Fonts (loaded at runtime).
+- Font: Noto Sans (loaded from Google Fonts). For offline-first audiences, self-host the WOFF2 files from <https://fonts.google.com>.
+- Video uses `preload="metadata"`, so the poster JPG loads immediately but the MP4 only downloads on play.
+- `<meta property="og:image">` points at the poster JPG, so link previews on Twitter / Slack / Discord show the demo frame.
+- Template credit footer links to Nerfies, per the convention.
