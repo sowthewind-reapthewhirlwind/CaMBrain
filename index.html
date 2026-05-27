@@ -424,7 +424,7 @@ footer a:hover { color: var(--ink); }
     <h2>Contributions</h2>
     <ol class="tldr-list">
       <li>The first <b>causal</b> Mamba-based EEG foundation model with verified streaming inference, updating a single <code>O(1)</code>-size hidden state per 62.5&nbsp;ms patch.</li>
-      <li>A multi-stage causal self-supervised training pipeline: causal autoregressive masking, followed by EMA-JEPA latent prediction with LUNA channel adaptation.</li>
+      <li>A multi-stage causal self-supervised training pipeline: Stage&nbsp;1 causal autoregressive + masked reconstruction pretraining, followed by Stage&nbsp;2 decoder-free latent JEPA training under a student&ndash;teacher (EMA) framework.</li>
       <li>State-of-the-art AUROC on TUAR (artifact), CHB-MIT (seizure), and MAT (mental stress) at 36.7M parameters &mdash; matching or beating bidirectional models up to 8&times; larger.</li>
       <li>Streaming-equivalent inference verified against parallel forward passes across 30 seeds and 3 checkpoints (max logit deviation &lt; 6&times;10<sup>&minus;3</sup>).</li>
       <li><b>1.23 GFLOPs/s</b> sustained compute at 16&nbsp;Hz update rate &mdash; 6&times; lower than CBraMod, 158&times; lower than REVE-Base at typical streaming frequencies.</li>
