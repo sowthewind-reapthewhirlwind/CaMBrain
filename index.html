@@ -120,6 +120,10 @@ h1 {
   max-width: 280px;
   vertical-align: middle;
 }
+/* LLU is portrait-orientation; give it more vertical space so it reads at the same visual weight */
+.logo-row img[alt^="Loma"] {
+  height: 64px;
+}
 .logo-row a { display: inline-flex; align-items: center; }
 
 /* ---- Action buttons ---- */
@@ -301,12 +305,9 @@ footer a:hover { color: var(--ink); }
 
   <!-- ====================== TITLE ====================== -->
   <header class="title-block">
-    <h1>CaMBRAIN: Real-time, Continuous EEG Inference<br/>with Causal State Space Models</h1>
+    <h1>CaMBRAIN: Real-time, Continuous EEG Inference with Causal State Space Models</h1>
     <style>
-      @media (min-width: 900px) {
-        h1 br { display: none; }
-        h1 { max-width: 24ch; margin-left: auto; margin-right: auto; }
-      }
+      h1 { max-width: 22ch; margin-left: auto; margin-right: auto; }
     </style>
     <div class="venue">Preprint &middot; 2026</div>
 
@@ -334,15 +335,21 @@ footer a:hover { color: var(--ink); }
     <!-- Affiliation logos -->
     <div class="logo-row">
       <div class="logo-item">
-        <span class="num"><sup>1,2</sup></span>
+        <span class="num"><sup>1</sup></span>
         <a href="https://www.crcv.ucf.edu/" target="_blank" rel="noopener">
           <img src="assets/logos/crcv_ucf.jpg" alt="UCF Center for Research in Computer Vision" />
         </a>
       </div>
       <div class="logo-item">
+        <span class="num"><sup>2</sup></span>
+        <a href="https://www.ucf.edu/" target="_blank" rel="noopener">
+          <img src="assets/logos/ucf.png" alt="University of Central Florida" />
+        </a>
+      </div>
+      <div class="logo-item">
         <span class="num"><sup>3</sup></span>
         <a href="https://medicine.llu.edu/" target="_blank" rel="noopener">
-          <img src="https://logowik.com/content/uploads/images/loma-linda-university-llu4536.jpg" alt="Loma Linda University" />
+          <img src="assets/logos/llu.png" alt="Loma Linda University" />
         </a>
       </div>
     </div>
@@ -371,6 +378,14 @@ footer a:hover { color: var(--ink); }
     </div>
   </header>
 
+  <!-- ====================== TEASER (Fig 1) ====================== -->
+  <div class="figure" style="margin-top: 8px;">
+    <img src="assets/teaser.png" alt="Existing windowed methods vs CaMBRAIN streaming. Compute efficiency comparison on the right." />
+    <p class="fig-cap">
+      <b>Figure 1.</b> Existing methods (top) operate on overlapping sliding windows, repeatedly recomputing features over shared regions and limiting context to short segments. In contrast, CaMBRAIN (bottom) enables continuous EEG inference by maintaining a persistent hidden state that incrementally compresses all past context, eliminating redundant computation and enabling efficient, global temporal EEG understanding in real time (right). Window sizes not to scale.
+    </p>
+  </div>
+
   <!-- ====================== HERO VIDEO ====================== -->
   <div class="hero-video">
     <video controls playsinline preload="metadata"
@@ -391,6 +406,17 @@ footer a:hover { color: var(--ink); }
     <p>Electroencephalography (EEG) is a critical, non-invasive method to monitor electrical brain activity. EEGs can span anywhere from a couple seconds to multiple hours, posing a major hurdle for existing deep learning methods: (1) existing EEG models are predominantly built on attention, incurring quadratic scaling as sequence length increases, and (2) raw EEG must be processed in a sliding-window fashion due to fixed-length input requirements, preventing global understanding of the entire signal.</p>
     <p>We propose <b>CaMBRAIN</b> &mdash; the first causal, Mamba-based state space model (SSM) capable of real-time inference of EEG, arguing that bidirectional approaches are needlessly expensive given the causal, unidirectional nature of EEG. Training such a model is non-trivial: crucial EEG events can be extremely brief &mdash; within fractions of a second &mdash; yet separated by long intervals spanning minutes. Reconstruction-based self-supervised objectives are not well suited for streaming SSMs; they fail to train the hidden state to retain the salient long-range context needed for streaming inference.</p>
     <p>We therefore introduce a multi-stage self-supervised training pipeline tailored to encourage long-range memory retention while preserving the linear-time complexity of state space models. CaMBRAIN achieves state-of-the-art results across 3 EEG datasets with <b>more than 10&times;</b> higher throughput than existing models, enabling long-range, continuous inference of variable-length EEG signals.</p>
+  </section>
+
+  <!-- ====================== METHOD ====================== -->
+  <section id="method">
+    <h2>Method overview</h2>
+    <div class="figure" style="margin: 0 0 18px;">
+      <img src="assets/architecture.png" alt="CaMBRAIN architecture: causal Mamba-3 state space model processing 62.5 ms patches with persistent hidden state, alongside the three-stage training pipeline." />
+      <p class="fig-cap">
+        <b>Figure 2.</b> Overview of <b>CaMBRAIN</b>. CaMBRAIN is a causal state space model that processes EEG in 62.5&nbsp;ms patches using a unidirectional state space model with a persistent hidden state. We train it with a three-stage pipeline: (1) causal predictive pretraining with autoregressive and masked reconstruction objectives to learn local temporal structure, (2) decoder-free latent JEPA training using a student&ndash;teacher framework to enforce long-range consistency and memory retention in the hidden state, and (3) downstream fine-tuning for task-specific prediction. This design enables real-time, continuous inference over arbitrarily long EEG recordings.
+      </p>
+    </div>
   </section>
 
   <!-- ====================== CONTRIBUTIONS ====================== -->

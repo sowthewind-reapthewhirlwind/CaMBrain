@@ -22,28 +22,21 @@ For the CRCV lab convention specifically (matching e.g. `ucf-crcv.github.io/GAEA
 └── assets/
     ├── ContinuousEEG.mp4               (the demo video, 2.2 MB)
     ├── ContinuousEEG-poster.jpg        (poster frame shown before play)
+    ├── teaser.png                       (Figure 1 from the paper, downsized)
+    ├── architecture.png                 (Figure 2, vector-rendered from CONBA.pdf)
     └── logos/
-        └── crcv_ucf.jpg                (official CRCV + UCF combined logo, 1003×171)
+        ├── crcv_ucf.jpg                (combined CRCV + UCF logo, official from UCF-CRCV/GAEA repo)
+        ├── ucf.png                     (UCF Pegasus + UCF wordmark, extracted from combined)
+        └── llu.png                     (Loma Linda University official emblem, provided by author)
 ```
 
-## About the Loma Linda logo
+## About the logos
 
-The CRCV+UCF logo (`assets/logos/crcv_ucf.jpg`) is the **official combined lab logo**, pulled from the [UCF-CRCV/GAEA](https://github.com/UCF-CRCV/GAEA) repo's `Assets/` folder. It's the exact file the lab uses on its other paper pages.
+**CRCV (affil 1)**: `assets/logos/crcv_ucf.jpg` is the **official combined lab logo**, pulled from the [UCF-CRCV/GAEA](https://github.com/UCF-CRCV/GAEA) repo's `Assets/` folder. It's the exact file the CRCV lab uses on its other paper pages (GAEA, TF-CoVR, etc.).
 
-The Loma Linda logo is currently **hotlinked from logowik.com** (a free-vector-logo site), so the browser fetches it at view time. It works, but it's an external dependency — if logowik changes the URL or goes down, the LLU logo won't load. Recommended swap for the polished version:
+**UCF (affil 2)**: `assets/logos/ucf.png` is the UCF Pegasus + UCF wordmark, extracted from the left portion of the combined CRCV logo above. If you want a higher-resolution standalone UCF mark, grab one from <https://www.ucf.edu/brand/brand-assets/logo-identity-system/> — use the **Primary Mark** (Pegasus + UCF wordmark), NOT the Knights athletic logo.
 
-1. Email Dr. Gireesh or LLU Health Marketing (`marketing@llu.edu`) and ask for the official LLU School of Medicine logo as PNG or SVG. The brand portal at <https://styleguide.lluh.org/graphic-identity-guide/downloads> has it behind a "use agreement" click-through.
-2. Save the file as `assets/logos/llu.png` (or `.svg`) with a transparent background, sized to ~120px tall at 2× resolution.
-3. In `index.html`, find the LLU `<img>` tag and change:
-   ```html
-   <img src="https://logowik.com/content/uploads/images/loma-linda-university-llu4536.jpg" alt="Loma Linda University" />
-   ```
-   to:
-   ```html
-   <img src="assets/logos/llu.png" alt="Loma Linda University" />
-   ```
-
-That removes the external dependency.
+**LLU (affil 3)**: `assets/logos/llu.png` is the official Loma Linda University emblem (maroon shield with the "To Make Man Whole" motto). All three logos are now local files with no external dependencies.
 
 ## Toggle the "Soon" buttons live
 
